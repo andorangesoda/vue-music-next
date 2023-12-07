@@ -1,8 +1,9 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Recommend from '@/views/recommend'
-import Singer from '@/views/singer'
-import TopList from '@/views/top-list'
-import Search from '@/views/search'
+// 懒加载
+const Recommend = () => import('@/views/recommend')
+const Singer = () => import('@/views/singer')
+const TopList = () => import('@/views/top-list')
+const Search = () => import('@/views/search')
 
 const routes = [
   {
