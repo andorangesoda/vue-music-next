@@ -5,9 +5,15 @@
 </template>
 
 <script>
+import { getRecommend } from '@/service/recommend'
+
 export default {
   // 组件名称
-  name: 'recommend'
+  name: 'recommend',
+  async created() {
+    const res = await getRecommend()
+    console.log(res)
+  }
 }
 </script>
 
