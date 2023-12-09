@@ -1,18 +1,32 @@
 <template>
   <div class="recommend">
-    推荐页面
+    <div class="slider-wrapper">
+      <div class="slider-content">
+        <!-- 轮播图，存在的情况下才显示 -->
+        <slider v-if="sliders.length" :sliders="sliders" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { getRecommend } from '@/service/recommend'
+import Slider from '@/components/base/slider/slider'
 
 export default {
   // 组件名称
   name: 'recommend',
+  components: {
+    Slider
+  },
+  data() {
+    return {
+      sliders: []
+    }
+  },
   async created() {
     const res = await getRecommend()
-    console.log(res)
+    this.sliders = res.sliders
   }
 }
 </script>
