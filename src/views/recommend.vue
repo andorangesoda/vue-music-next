@@ -12,7 +12,7 @@
         </div>
         <!-- 热门歌单 -->
         <div class="recommend-list">
-          <h1 class="list-title">热门歌单推荐</h1>
+          <h1 class="list-title" v-show="sliders.length">热门歌单推荐</h1>
           <ul>
             <li class="item" v-for="item in albums" :key="item.id">
               <div class="icon">
