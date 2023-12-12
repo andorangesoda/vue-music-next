@@ -4,7 +4,7 @@
       <li class="group" v-for="group in data" :key="group.title">
         <h2 class="title"> {{group.title}} </h2>
         <ul>
-          <li class="item" v-for="item in group.list" :key="item.id">
+          <li class="item" v-for="item in group.list" :key="item.id" @click="onItemClick(item)">
             <img v-if="item.pic" class="avatar" :src="item.pic">
             <img v-else class="avatar" src="@/assets/images/default.png">
             <span class="name"> {{item.name}} </span>
@@ -30,6 +30,13 @@ export default {
         return []
       }
     }
+  },
+  emits: ['select'],
+  setup (props, { emit }) {
+    function onItemClick(item) {
+      emit('select', item)
+    }
+    return { onItemClick }
   }
 }
 </script>
