@@ -1,6 +1,6 @@
 <template>
   <div class="singer">
-    <index-list :data="singers" @select="selectSinger" />
+    <index-list class="singer-list" :data="singers" @select="selectSinger"></index-list>
     <router-view :singer="selectedSinger"/>
   </div>
 </template>
@@ -41,5 +41,10 @@ export default {
   width: 100%;
   top: 88px;
   bottom: 0;
+  overflow: scroll;
+  .singer-list {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 </style>
