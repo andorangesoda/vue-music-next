@@ -5,6 +5,7 @@
 
 <script>
 import { getSingerDetail } from '@/service/singer'
+import { processSongs } from '@/service/song'
 
 export default {
   name: 'singer-detail',
@@ -13,7 +14,9 @@ export default {
   },
   async created() {
     const res = await getSingerDetail(this.singer)
-    console.log(res.songs)
+    // 获取url
+    const songs = await processSongs(res.songs)
+    console.log(songs)
   }
 }
 </script>

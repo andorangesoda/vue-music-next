@@ -22,5 +22,6 @@ yarn build
 yarn lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 注意⚠️
+
+1、`axios` 请使用 `^0.21.1`版本，不然可能无法获取到 song 的播放 url 。

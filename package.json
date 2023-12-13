@@ -11,7 +11,7 @@
     "@better-scroll/core": "^2.5.1",
     "@better-scroll/observe-dom": "^2.5.1",
     "@better-scroll/slide": "^2.5.1",
-    "axios": "^1.6.2",
+    "axios": "^0.21.1",
     "core-js": "^3.8.3",
     "express": "^4.18.2",
     "vue": "^3.2.13",

@@ -402,6 +402,10 @@ function registerSongsUrl(app) {
       // 发送 post 请求
       return post(url, data).then((response) => {
         const data = response.data
+
+        console.log('获取歌曲url')
+        console.log(data)
+
         if (data.code === ERR_OK) {
           const midInfo = data.req_0.data.midurlinfo
           const sip = data.req_0.data.sip
