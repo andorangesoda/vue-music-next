@@ -5,16 +5,6 @@ export function processSongs(songs) {
     return Promise.resolve(songs)
   }
 
-  try {
-    const result = get('/api/getSongsUrl', {
-      mid: songs.map((song) => {
-        return song.mid
-      })
-    })
-    console.dir(result)
-  } catch (err) {
-    console.log(err)
-  }
   return get('/api/getSongsUrl', {
     mid: songs.map((song) => {
       return song.mid
