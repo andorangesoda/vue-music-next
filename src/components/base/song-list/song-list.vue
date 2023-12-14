@@ -22,7 +22,7 @@ export default {
   },
   methods: {
     getSongDesc(song) {
-      console.log(song)
+      // console.log(song)
       return `${song.singer}·${song.album}`
     }
   }

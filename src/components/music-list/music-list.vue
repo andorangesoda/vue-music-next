@@ -1,16 +1,17 @@
 <template>
   <div class="music-list">
-    <div class="back">
+    <div class="back" @click="$router.back()">
       <i class="icon-back"></i>
     </div>
 
     <h1 class="title"> {{title}} </h1>
 
-    <div class="bg-image">
+    <div class="bg-image" :style="bgImageStyle" ref="bgImage">
+      <!-- 蒙板 -->
       <div class="filter"></div>
     </div>
 
-    <scroll class="list">
+    <scroll class="list" :style="scrollStyle">
       <!-- 歌曲列表 -->
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
@@ -38,6 +39,26 @@ export default {
     },
     title: String,
     pic: String
+  },
+  data() {
+    return {
+      imageHeight: 0
+    }
+  },
+  computed: {
+    bgImageStyle() {
+      return {
+        backgroundImage: `url(${this.pic})`
+      }
+    },
+    scrollStyle() {
+      return {
+        top: `${this.imageHeight}px`
+      }
+    }
+  },
+  mounted() {
+    this.imageHeight = this.$refs.bgImage.clientHeight
   }
 }
 </script>
@@ -79,6 +100,8 @@ export default {
     // 指定元素变换的原点在顶部
     transform-origin: top;
     background-size: cover;
+    padding-bottom: 80%;
+    height: 0;
     .filter {
       position: absolute;
       // 水平、垂直居中

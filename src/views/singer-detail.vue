@@ -32,6 +32,7 @@ export default {
     const res = await getSingerDetail(this.singer)
     // 获取url
     this.songs = await processSongs(res.songs)
+    // console.log(this.songs)
   }
 }
 </script>
