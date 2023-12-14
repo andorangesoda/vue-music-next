@@ -8,6 +8,8 @@
 import { getSingerDetail } from '@/service/singer'
 import { processSongs } from '@/service/song'
 import MusicList from '@/components/music-list/music-list.vue'
+import storage from 'good-storage'
+import { SINGER_KEY } from '@/assets/js/constant'
 
 export default {
   name: 'singer-detail',
@@ -21,18 +23,40 @@ export default {
     }
   },
   computed: {
+    computedSinger() {
+      let res = ''
+      const singer = this.singer
+      if (singer) {
+        res = singer
+      } else {
+        // 页面刷新时，没有singer，此时需要从缓存中获取
+        const cacheSinger = storage.session.get(SINGER_KEY)
+        if (cacheSinger && cacheSinger.mid === this.$route.params.id) {
+          res = cacheSinger
+        }
+      }
+      return res
+    },
     pic() {
-      return this.singer && this.singer.pic
+      const singer = this.computedSinger
+      return singer && singer.pic
     },
     title() {
-      return this.singer && this.singer.name
+      const singer = this.computedSinger
+      return singer && singer.name
     }
   },
   async created() {
-    const res = await getSingerDetail(this.singer)
+    const singer = this.computedSinger
+    if (!singer) {
+      // 未获取到歌手时，跳转到地址中匹配的第一个路径
+      const path = this.$route.matched[0].path
+      this.$router.push({ path })
+      return
+    }
+    const res = await getSingerDetail(singer)
     // 获取url
     this.songs = await processSongs(res.songs)
-    // console.log(this.songs)
   }
 }
 </script>
