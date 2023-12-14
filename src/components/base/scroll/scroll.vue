@@ -16,12 +16,18 @@ export default {
     click: {
       type: Boolean,
       default: true
+    },
+    probeType: {
+      type: Number,
+      default: 0
     }
   },
-  setup(props) {
+  // 声明可以触发的自定义事件
+  emits: ['scroll'],
+  setup(props, { emit }) {
     const rootRef = ref(null)
-    useScroll(rootRef, props)
-    return { rootRef }
+    const scroll = useScroll(rootRef, props, emit)
+    return { rootRef, scroll }
   }
 }
 </script>

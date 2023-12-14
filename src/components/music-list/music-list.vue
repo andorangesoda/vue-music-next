@@ -11,7 +11,7 @@
       <div class="filter"></div>
     </div>
 
-    <scroll class="list" :style="scrollStyle">
+    <scroll class="list" :style="scrollStyle" :probe-type="3" @scroll="onScroll">
       <!-- 歌曲列表 -->
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
@@ -23,6 +23,9 @@
 <script>
 import Scroll from '@/components/base/scroll/scroll.vue'
 import SongList from '@/components/base/song-list/song-list'
+
+// 歌曲列表到顶部之间保留40px
+const RESERVED_HEIGHT = 40
 
 export default {
   name: 'music-list',
@@ -42,13 +45,35 @@ export default {
   },
   data() {
     return {
-      imageHeight: 0
+      imageHeight: 0,
+      scrollY: 0,
+      // 歌曲列表最大可以滚动的高度
+      maxTranslateY: 0
     }
   },
   computed: {
     bgImageStyle() {
+      const scrollY = this.scrollY
+      let zIndex = 0
+      let paddingTop = '70%'
+      let height = 0
+      // 兼容移动端问题
+      let translateZ = 0
+
+      if (scrollY > this.maxTranslateY) {
+        // 数值越大，元素就越靠前。目的是不要让歌曲列表遮盖了顶部保留的背景图
+        zIndex = 10
+        paddingTop = 0
+        height = `${RESERVED_HEIGHT}px`
+        translateZ = 1
+      }
+
       return {
-        backgroundImage: `url(${this.pic})`
+        backgroundImage: `url(${this.pic})`,
+        zIndex,
+        paddingTop,
+        height,
+        transform: `translateZ(${translateZ}px)`
       }
     },
     scrollStyle() {
@@ -59,6 +84,13 @@ export default {
   },
   mounted() {
     this.imageHeight = this.$refs.bgImage.clientHeight
+    this.maxTranslateY = this.imageHeight - RESERVED_HEIGHT
+  },
+  methods: {
+    onScroll(pos) {
+      // 获取当前滚动位置，为了方便计算，取反
+      this.scrollY = -pos.y
+    }
   }
 }
 </script>
@@ -100,8 +132,9 @@ export default {
     // 指定元素变换的原点在顶部
     transform-origin: top;
     background-size: cover;
-    padding-bottom: 80%;
-    height: 0;
+    // 动态处理
+    // padding-bottom: 70%;
+    // height: 0;
     .filter {
       position: absolute;
       // 水平、垂直居中
