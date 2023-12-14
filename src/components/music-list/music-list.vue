@@ -68,12 +68,18 @@ export default {
         translateZ = 1
       }
 
+      // 当下滑时设置缩放比例
+      let scale = 1
+      if (scrollY < 0) {
+        scale = 1 + Math.abs(scrollY / this.imageHeight)
+      }
+
       return {
         backgroundImage: `url(${this.pic})`,
         zIndex,
         paddingTop,
         height,
-        transform: `translateZ(${translateZ}px)`
+        transform: `scale(${scale})translateZ(${translateZ}px)`
       }
     },
     scrollStyle() {
@@ -88,7 +94,7 @@ export default {
   },
   methods: {
     onScroll(pos) {
-      // 获取当前滚动位置，为了方便计算，取反
+      // 获取当前滚动位置，为了方便计算，取负值，即往下滑为负数，往上滑为正数
       this.scrollY = -pos.y
     }
   }
