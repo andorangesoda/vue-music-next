@@ -14,7 +14,7 @@
     <scroll class="list" :style="scrollStyle" :probe-type="3" @scroll="onScroll">
       <!-- 歌曲列表 -->
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list :songs="songs" @select="onSelectSong"></song-list>
       </div>
     </scroll>
   </div>
@@ -23,6 +23,7 @@
 <script>
 import Scroll from '@/components/base/scroll/scroll.vue'
 import SongList from '@/components/base/song-list/song-list'
+import { mapActions } from 'vuex'
 
 // 歌曲列表到顶部之间保留40px
 const RESERVED_HEIGHT = 40
@@ -96,7 +97,18 @@ export default {
     onScroll(pos) {
       // 获取当前滚动位置，为了方便计算，取负值，即往下滑为负数，往上滑为正数
       this.scrollY = -pos.y
-    }
+    },
+    onSelectSong({ song, index }) {
+      // 选择歌曲后，触发子组件中自定义事件，然后父组件监听并响应
+      this.selectPlay({
+        list: this.songs,
+        index
+      })
+    },
+    // 使用到 actions 中的方法
+    ...mapActions([
+      'selectPlay'
+    ])
   }
 }
 </script>

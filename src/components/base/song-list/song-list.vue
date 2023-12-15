@@ -1,6 +1,6 @@
 <template>
   <ul class="song-list">
-    <li class="item" v-for="song in songs" :key="song.id">
+    <li class="item" v-for="(song, index) in songs" :key="song.id" @click="selectSong(song,index)">
       <div class="content">
         <h2 class="name"> {{song.name}} </h2>
         <p class="desc"> {{getSongDesc(song)}} </p>
@@ -20,10 +20,15 @@ export default {
       }
     }
   },
+  emits: ['select'],
   methods: {
     getSongDesc(song) {
       // console.log(song)
       return `${song.singer}·${song.album}`
+    },
+    selectSong(song, index) {
+      // emit 用于在 Vue 组件中触发自定义事件，从而在父组件(例如, music-list.vue)中监听并执行相应逻辑
+      this.$emit('select', { song, index })
     }
   }
 }
