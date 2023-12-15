@@ -9,6 +9,13 @@
     <div class="bg-image" :style="bgImageStyle" ref="bgImage">
       <!-- 蒙板 -->
       <div class="filter"></div>
+      <!-- 随机播放 -->
+      <div class="play-btn-wrapper" :style="playBtnStyle">
+        <div class="play-btn" v-show="songs.length > 0" @click="onRandomPlay">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
     </div>
 
     <scroll class="list" :style="scrollStyle" :probe-type="3" @scroll="onScroll">
@@ -87,6 +94,13 @@ export default {
       return {
         top: `${this.imageHeight}px`
       }
+    },
+    playBtnStyle() {
+      let display = ''
+      if (this.scrollY >= this.maxTranslateY) {
+        display = 'none'
+      }
+      return { display }
     }
   },
   mounted() {
@@ -105,9 +119,13 @@ export default {
         index
       })
     },
+    onRandomPlay() {
+      this.randomPlay(this.songs)
+    },
     // 使用到 actions 中的方法
     ...mapActions([
-      'selectPlay'
+      'selectPlay',
+      'randomPlay'
     ])
   }
 }
@@ -161,6 +179,34 @@ export default {
       width: 100%;
       height: 100%;
       background: rgba(7, 17, 27, 0.4);
+    }
+    .play-btn-wrapper{
+      position: absolute;
+      width: 100%;
+      bottom: 20px;
+      z-index: 10;
+      .play-btn{
+        width: 135px;
+        padding: 7px 0;
+        margin: 0 auto;
+        text-align: center;
+        font-size: 0;
+        color: $color-theme;
+        border: 1px solid $color-theme;
+        border-radius: 100px;
+        box-sizing: border-box;
+      }
+      .icon-play{
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 6px;
+        font-size: $font-size-medium-x;
+      }
+      .text{
+        display: inline-block;
+        vertical-align: middle;
+        font-size: $font-size-small;
+      }
     }
   }
   .list {
