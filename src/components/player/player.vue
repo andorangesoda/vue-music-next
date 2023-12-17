@@ -19,13 +19,13 @@
           <div class="icon i-left">
             <i class="icon-sequence"></i>
           </div>
-          <div class="icon i-left" @click="prev">
+          <div class="icon i-left" @click="prev" :class="disableCls">
             <i class="icon-prev"></i>
           </div>
-          <div class="icon i-center" @click="togglePlay">
+          <div class="icon i-center" @click="togglePlay" :class="disableCls">
             <i :class="playIcon"></i>
           </div>
-          <div class="icon i-right" @click="next">
+          <div class="icon i-right" @click="next" :class="disableCls">
             <i class="icon-next"></i>
           </div>
           <div class="icon i-right">
@@ -35,7 +35,7 @@
       </div>
     </div>
     <!-- 通过ref 拿到这个audio -->
-    <audio ref="audioRef" @pause="onPause"></audio>
+    <audio ref="audioRef" @pause="onPause" @canplay="ready" @error="error"></audio>
   </div>
 </template>
 
@@ -47,27 +47,34 @@ export default {
   name: 'player',
   setup() {
     const store = useStore()
+    const audioRef = ref(null)
+    const songReady = ref(false)
+
     const fullScreen = computed(() => store.state.fullScreen)
     const currentSong = computed(() => store.getters.currentSong)
-    const audioRef = ref(null)
     const playingState = computed(() => store.state.playingState)
-    const playIcon = computed(() => {
-      return playingState.value ? 'icon-pause' : 'icon-play'
-    })
+    const playIcon = computed(() => playingState.value ? 'icon-pause' : 'icon-play')
     const playList = computed(() => store.state.playList)
     const currentIdx = computed(() => store.state.currentIndex)
+    const disableCls = computed(() => songReady.value ? '' : 'disable')
 
     // 初始化时会执行一次，然后当监听的数据发生变化(即当前歌曲切换)时，watch 的回调函数会触发
     watch(currentSong, (newSong) => {
       if (!newSong.id || !newSong.url) {
         return
       }
+      // 这里置为 false, 下方 play() 时会触发 @canplay, 从而在对于方法中将 songReady 置为 true
+      songReady.value = false
       const audioEl = audioRef.value
       audioEl.src = newSong.url
       // 调用播放
       audioEl.play()
     })
     watch(playingState, (newPlayingState) => {
+      if (!songReady.value) {
+        // 歌曲没缓存好时，直接返回，不播放
+        return
+      }
       const audioEl = audioRef.value
       newPlayingState ? audioEl.play() : audioEl.pause()
     })
@@ -76,6 +83,9 @@ export default {
       store.commit('setFullScreen', false)
     }
     function togglePlay() {
+      if (!songReady.value) {
+        return
+      }
       store.commit('setPlayingState', !playingState.value)
     }
     // 当电脑睡眠或其他情况导致播放停止时，同步播放状态为false
@@ -89,7 +99,7 @@ export default {
     }
     function prev() {
       const list = playList.value
-      if (!list) { return }
+      if (!songReady.value || !list) { return }
       if (list.length === 1) {
         loop()
       } else {
@@ -106,7 +116,7 @@ export default {
     }
     function next() {
       const list = playList.value
-      if (!list) { return }
+      if (!songReady.value || !list) { return }
       if (list.length === 1) {
         loop()
       } else {
@@ -121,17 +131,28 @@ export default {
         }
       }
     }
+    function ready() {
+      if (songReady.value) { return }
+      songReady.value = true
+    }
+    function error() {
+      // 发生错误时，置为 true 使得可以切换歌曲
+      songReady.value = true
+    }
 
     return {
       fullScreen,
       currentSong,
       audioRef,
       playIcon,
+      disableCls,
       goBack,
       togglePlay,
       onPause,
       prev,
-      next
+      next,
+      ready,
+      error
     }
   }
 }
