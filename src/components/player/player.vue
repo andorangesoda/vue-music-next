@@ -29,7 +29,7 @@
             <i class="icon-next"></i>
           </div>
           <div class="icon i-right">
-            <i class="icon-not-favorite"></i>
+            <i :class="getFavoriteIcon(currentSong)" @click="toggleFavoriteSong(currentSong)"></i>
           </div>
         </div>
       </div>
@@ -42,6 +42,7 @@
 <script>
 import { useStore } from 'vuex'
 import { computed, watch, ref } from 'vue'
+import useFavorite from './use-favorite'
 
 export default {
   name: 'player',
@@ -57,6 +58,8 @@ export default {
     const playList = computed(() => store.state.playList)
     const currentIdx = computed(() => store.state.currentIndex)
     const disableCls = computed(() => songReady.value ? '' : 'disable')
+
+    const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
 
     // 初始化时会执行一次，然后当监听的数据发生变化(即当前歌曲切换)时，watch 的回调函数会触发
     watch(currentSong, (newSong) => {
@@ -152,7 +155,9 @@ export default {
       prev,
       next,
       ready,
-      error
+      error,
+      getFavoriteIcon,
+      toggleFavoriteSong
     }
   }
 }
