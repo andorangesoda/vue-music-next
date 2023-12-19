@@ -13,6 +13,16 @@
         <h1 class="title"> {{currentSong.name}} </h1>
         <h2 class="subtitle"> {{currentSong.singer}} </h2>
       </div>
+      <!-- 中间 CD 唱片    -->
+      <div class="middle">
+        <div class="middle-l">
+          <div class="cd-wrapper">
+            <div class="cd" ref="cdRef">
+              <img class="image" :class="cdCls" ref="cdImageRef" :src="currentSong.pic">
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- 底部播放菜单栏 -->
       <div class="bottom">
         <div class="operators">
@@ -43,6 +53,7 @@
 import { useStore } from 'vuex'
 import { computed, watch, ref } from 'vue'
 import useFavorite from './use-favorite'
+import useCd from '@/components/player/use-cd'
 
 export default {
   name: 'player',
@@ -59,7 +70,9 @@ export default {
     const currentIdx = computed(() => store.state.currentIndex)
     const disableCls = computed(() => songReady.value ? '' : 'disable')
 
+    // hooks
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
+    const { cdCls, cdRef, cdImageRef } = useCd()
 
     // 初始化时会执行一次，然后当监听的数据发生变化(即当前歌曲切换)时，watch 的回调函数会触发
     watch(currentSong, (newSong) => {
@@ -149,6 +162,9 @@ export default {
       audioRef,
       playIcon,
       disableCls,
+      cdCls,
+      cdRef,
+      cdImageRef,
       goBack,
       togglePlay,
       onPause,
@@ -218,6 +234,47 @@ export default {
         text-align: center;
         font-size: $font-size-medium;
         color: $color-text;
+      }
+    }
+    .middle {
+      position: fixed;
+      width: 100%;
+      top: 80px;
+      bottom: 170px;
+      white-space: nowrap;
+      font-size: 0;
+      .middle-l {
+        display: inline-block;
+        vertical-align: top;
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-top: 80%;
+        .cd-wrapper {
+          position: absolute;
+          left: 10%;
+          top: 0;
+          width: 80%;
+          box-sizing: border-box;
+          height: 100%;
+          .cd {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            .image {
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              box-sizing: border-box;
+              border-radius: 50%;
+              border: 10px solid rgba(255, 255, 255, 0.1);
+            }
+            .playing {
+              animation: rotate 20s linear infinite
+            }
+          }
+        }
       }
     }
     .bottom {
