@@ -21,6 +21,9 @@
               <img class="image" :class="cdCls" ref="cdImageRef" :src="currentSong.pic">
             </div>
           </div>
+          <div class="playing-lyric-wrapper">
+            <div class="playing-lyric">{{playingLyric}}</div>
+          </div>
         </div>
         <scroll class="middle-r" ref="lyricScrollRef">
           <div class="lyric-wrapper">
@@ -28,6 +31,9 @@
               <p class="text" :class="{'current': currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="line.num">
                 {{ line.txt }}
               </p>
+            </div>
+            <div class="pure-music" v-show="pureMusicLyric">
+              <p>{{pureMusicLyric}}</p>
             </div>
           </div>
         </scroll>
@@ -88,7 +94,7 @@ export default {
     // hooks
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
     const { cdCls, cdRef, cdImageRef } = useCd()
-    const { currentLyric, currentLineNum, playLyric, lyricListRef, lyricScrollRef, stopLyric } = useLyric({ songReady, currentTime })
+    const { currentLyric, currentLineNum, playLyric, lyricListRef, lyricScrollRef, stopLyric, pureMusicLyric, playingLyric } = useLyric({ songReady, currentTime })
 
     // 初始化时会执行一次，然后当监听的数据发生变化(即当前歌曲切换)时，watch 的回调函数会触发
     watch(currentSong, (newSong) => {
@@ -203,7 +209,9 @@ export default {
       getFavoriteIcon,
       toggleFavoriteSong,
       playLyric,
-      stopLyric
+      stopLyric,
+      pureMusicLyric,
+      playingLyric
     }
   }
 }
@@ -305,6 +313,18 @@ export default {
             }
           }
         }
+        .playing-lyric-wrapper {
+          width: 80%;
+          margin: 30px auto 0 auto;
+          overflow: hidden;
+          text-align: center;
+          .playing-lyric {
+            height: 20px;
+            line-height: 20px;
+            font-size: $font-size-medium;
+            color: $color-text-l;
+          }
+        }
       }
       .middle-r {
         display: inline-block;
@@ -319,6 +339,15 @@ export default {
           overflow: hidden;
           text-align: center;
           .text {
+            line-height: 32px;
+            color: $color-text-l;
+            font-size: $font-size-medium;
+            &.current {
+              color: $color-text;
+            }
+          }
+          .pure-music {
+            padding-top: 50%;
             line-height: 32px;
             color: $color-text-l;
             font-size: $font-size-medium;

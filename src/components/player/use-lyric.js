@@ -8,6 +8,8 @@ export default function useLyric({ songReady, currentTime }) {
   const currentLineNum = ref(0)
   const lyricScrollRef = ref(0)
   const lyricListRef = ref(0)
+  const pureMusicLyric = ref('')
+  const playingLyric = ref('')
 
   const store = useStore()
   const currentSong = computed(() => store.getters.currentSong)
@@ -21,6 +23,8 @@ export default function useLyric({ songReady, currentTime }) {
     stopLyric()
     currentLyric.value = null
     currentLineNum.value = 0
+    pureMusicLyric.value = ''
+    playingLyric.value = ''
 
     const lyric = await getLyric(newSong)
     // 需要通过 mutation，添加歌词
@@ -36,10 +40,15 @@ export default function useLyric({ songReady, currentTime }) {
 
     // 通过第三方库解析歌词
     currentLyric.value = new Lyric(lyric, handleLyric)
-
-    // 在 player.vue 的 ready() 方法也调用 playLyric(), 这样无论歌词和歌曲哪个先执行都会触发播放歌词
-    if (songReady.value) {
-      playLyric()
+    const hasLyric = currentLyric.value.lines.length
+    if (hasLyric) {
+      // 在 player.vue 的 ready() 方法也调用 playLyric(), 这样无论歌词和歌曲哪个先执行都会触发播放歌词
+      if (songReady.value) {
+        playLyric()
+      }
+    } else {
+      // 没有歌词时，截掉默认字符串中的时间，即[00:00:00]
+      playingLyric.value = pureMusicLyric.value = lyric.replace(/\[(\d{2}):(\d{2}):(\d{2})\]/g, '')
     }
   })
 
@@ -84,6 +93,8 @@ export default function useLyric({ songReady, currentTime }) {
     playLyric,
     lyricListRef,
     lyricScrollRef,
-    stopLyric
+    stopLyric,
+    pureMusicLyric,
+    playingLyric
   }
 }
