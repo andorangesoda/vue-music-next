@@ -71,12 +71,15 @@ export default function useLyric({ songReady, currentTime }) {
    * 解析歌词时能拿到歌词的行号
    * @param lineNum
    */
-  function handleLyric({ lineNum }) {
+  function handleLyric({ lineNum, txt }) {
     currentLineNum.value = lineNum
+    playingLyric.value = txt
+
     const listEl = lyricListRef.value
     if (!listEl) {
       return
     }
+
     const scrollComp = lyricScrollRef.value
     if (lineNum > 5) {
       // 滚动时，顶部留5行的距离，这样当前歌词就一直显示在中间位置
