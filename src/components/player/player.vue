@@ -22,6 +22,15 @@
             </div>
           </div>
         </div>
+        <scroll class="middle-r" ref="lyricScrollRef">
+          <div class="lyric-wrapper">
+            <div v-if="currentLyric" ref="lyricListRef">
+              <p class="text" :class="{'current': currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="line.num">
+                {{ line.txt }}
+              </p>
+            </div>
+          </div>
+        </scroll>
       </div>
       <!-- 底部播放菜单栏 -->
       <div class="bottom">
@@ -54,13 +63,19 @@ import { useStore } from 'vuex'
 import { computed, watch, ref } from 'vue'
 import useFavorite from './use-favorite'
 import useCd from '@/components/player/use-cd'
+import Scroll from '@/components/base/scroll/scroll.vue'
+import useLyric from '@/components/player/use-lyric'
 
 export default {
   name: 'player',
+  components: {
+    Scroll
+  },
   setup() {
     const store = useStore()
     const audioRef = ref(null)
     const songReady = ref(false)
+    const currentTime = ref(0)
 
     const fullScreen = computed(() => store.state.fullScreen)
     const currentSong = computed(() => store.getters.currentSong)
@@ -73,6 +88,7 @@ export default {
     // hooks
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
     const { cdCls, cdRef, cdImageRef } = useCd()
+    const { currentLyric, currentLineNum, playLyric, lyricListRef, lyricScrollRef, stopLyric } = useLyric({ songReady, currentTime })
 
     // 初始化时会执行一次，然后当监听的数据发生变化(即当前歌曲切换)时，watch 的回调函数会触发
     watch(currentSong, (newSong) => {
@@ -92,7 +108,13 @@ export default {
         return
       }
       const audioEl = audioRef.value
-      newPlayingState ? audioEl.play() : audioEl.pause()
+      if (newPlayingState) {
+        audioEl.play()
+        playLyric()
+      } else {
+        audioEl.pause()
+        stopLyric()
+      }
     })
 
     function goBack() {
@@ -150,6 +172,8 @@ export default {
     function ready() {
       if (songReady.value) { return }
       songReady.value = true
+      // 在 use-lyric.js 中的 songReady的情况下，playLyric() 这样无论歌词和歌曲哪个先执行都会触发播放歌词
+      playLyric()
     }
     function error() {
       // 发生错误时，置为 true 使得可以切换歌曲
@@ -165,6 +189,10 @@ export default {
       cdCls,
       cdRef,
       cdImageRef,
+      currentLyric,
+      currentLineNum,
+      lyricListRef,
+      lyricScrollRef,
       goBack,
       togglePlay,
       onPause,
@@ -173,7 +201,9 @@ export default {
       ready,
       error,
       getFavoriteIcon,
-      toggleFavoriteSong
+      toggleFavoriteSong,
+      playLyric,
+      stopLyric
     }
   }
 }
@@ -273,6 +303,25 @@ export default {
             .playing {
               animation: rotate 20s linear infinite
             }
+          }
+        }
+      }
+      .middle-r {
+        display: inline-block;
+        // 与父元素的顶部对齐
+        vertical-align: top;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        .lyric-wrapper {
+          width: 80%;
+          margin: 0 auto;
+          overflow: hidden;
+          text-align: center;
+          .text {
+            line-height: 32px;
+            color: $color-text-l;
+            font-size: $font-size-medium;
           }
         }
       }
