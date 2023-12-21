@@ -21,3 +21,11 @@ function swap(arr, i, j) {
   arr[i] = arr[j]
   arr[j] = temp
 }
+
+export function formatTime(interval) {
+  // 使用 | 0 进行按位或操作时，这会截断小数部分，只保留整数部分。实现向下取整的效果。
+  interval = interval | 0
+  const minute = ((interval / 60 | 0) + '').padStart(2, '0')
+  const second = (interval % 60 + '').padStart(2, '0')
+  return `${minute}:${second}`
+}

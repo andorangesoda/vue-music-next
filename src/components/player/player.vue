@@ -40,6 +40,15 @@
       </div>
       <!-- 底部播放菜单栏 -->
       <div class="bottom">
+        <!-- 进度条 -->
+        <div class="progress-wrapper">
+          <span class="time time-l"> {{ formatTime(currentTime) }} </span>
+          <div class="progress-bar-wrapper">
+            <progress-bar :progress="progress"></progress-bar>
+          </div>
+          <span class="time time-r"> {{ formatTime(currentSong.duration) }} </span>
+        </div>
+        <!-- 菜单栏 -->
         <div class="operators">
           <div class="icon i-left">
             <i class="icon-sequence"></i>
@@ -60,7 +69,7 @@
       </div>
     </div>
     <!-- 通过ref 拿到这个audio -->
-    <audio ref="audioRef" @pause="onPause" @canplay="ready" @error="error"></audio>
+    <audio ref="audioRef" @pause="onPause" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
@@ -71,10 +80,13 @@ import useFavorite from './use-favorite'
 import useCd from '@/components/player/use-cd'
 import Scroll from '@/components/base/scroll/scroll.vue'
 import useLyric from '@/components/player/use-lyric'
+import ProgressBar from '@/components/player/progress-bar.vue'
+import { formatTime } from '@/assets/js/util'
 
 export default {
   name: 'player',
   components: {
+    ProgressBar,
     Scroll
   },
   setup() {
@@ -90,6 +102,7 @@ export default {
     const playList = computed(() => store.state.playList)
     const currentIdx = computed(() => store.state.currentIndex)
     const disableCls = computed(() => songReady.value ? '' : 'disable')
+    const progress = computed(() => currentTime.value / currentSong.value.duration)
 
     // hooks
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
@@ -101,6 +114,8 @@ export default {
       if (!newSong.id || !newSong.url) {
         return
       }
+      // 歌曲更新时，时间也需要更新
+      currentTime.value = 0
       // 这里置为 false, 下方 play() 时会触发 @canplay, 从而在对于方法中将 songReady 置为 true
       songReady.value = false
       const audioEl = audioRef.value
@@ -185,6 +200,10 @@ export default {
       // 发生错误时，置为 true 使得可以切换歌曲
       songReady.value = true
     }
+    function updateTime(e) {
+      // 利用 audio 的原生事件，更新当前时间
+      currentTime.value = e.target.currentTime
+    }
 
     return {
       fullScreen,
@@ -211,7 +230,11 @@ export default {
       playLyric,
       stopLyric,
       pureMusicLyric,
-      playingLyric
+      playingLyric,
+      currentTime,
+      progress,
+      formatTime,
+      updateTime
     }
   }
 }
@@ -359,6 +382,29 @@ export default {
       position: absolute;
       bottom: 50px;
       width: 100%;
+      .progress-wrapper {
+        display: flex;
+        align-items: center;
+        width: 80%;
+        margin: 0px auto;
+        padding: 10px 0;
+        .time {
+          color: $color-text;
+          font-size: $font-size-small;
+          flex: 0 0 40px;
+          line-height: 30px;
+          width: 40px;
+          &.time-l {
+            text-align: left;
+          }
+          &.time-r {
+            text-align: right;
+          }
+        }
+        .progress-bar-wrapper {
+          flex: 1;
+        }
+      }
       .operators {
         display: flex;
         align-items: center;
