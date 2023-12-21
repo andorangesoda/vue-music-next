@@ -13,9 +13,13 @@
         <h1 class="title"> {{currentSong.name}} </h1>
         <h2 class="subtitle"> {{currentSong.singer}} </h2>
       </div>
-      <!-- 中间 CD 唱片    -->
-      <div class="middle">
-        <div class="middle-l">
+      <!-- 中间唱片或歌词    -->
+      <div class="middle"
+           @touchstart.prevent="onMiddleTouchStart"
+           @touchmove.prevent="onMiddleTouchMove"
+           @touchend.prevent="onMiddleTouchEnd">
+        <!-- CD 唱片 -->
+        <div class="middle-l" :style="middleLStyle">
           <div class="cd-wrapper">
             <div class="cd" ref="cdRef">
               <img class="image" :class="cdCls" ref="cdImageRef" :src="currentSong.pic">
@@ -25,7 +29,8 @@
             <div class="playing-lyric">{{playingLyric}}</div>
           </div>
         </div>
-        <scroll class="middle-r" ref="lyricScrollRef">
+        <!-- 歌词 -->
+        <scroll class="middle-r" ref="lyricScrollRef" :style="middleRStyle">
           <div class="lyric-wrapper">
             <div v-if="currentLyric" ref="lyricListRef">
               <p class="text" :class="{'current': currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="line.num">
@@ -40,6 +45,11 @@
       </div>
       <!-- 底部播放菜单栏 -->
       <div class="bottom">
+        <!-- 定位点图标 -->
+        <div class="dot-wrapper">
+          <span class="dot" :class="{'active':currentShow==='cd'}"></span>
+          <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
+        </div>
         <!-- 进度条 -->
         <div class="progress-wrapper">
           <span class="time time-l"> {{ formatTime(currentTime) }} </span>
@@ -84,6 +94,7 @@ import Scroll from '@/components/base/scroll/scroll.vue'
 import useLyric from '@/components/player/use-lyric'
 import ProgressBar from '@/components/player/progress-bar.vue'
 import { formatTime } from '@/assets/js/util'
+import useMiddleInteractive from '@/components/player/use-middle-interactive'
 
 export default {
   name: 'player',
@@ -111,6 +122,7 @@ export default {
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
     const { cdCls, cdRef, cdImageRef } = useCd()
     const { currentLyric, currentLineNum, playLyric, lyricListRef, lyricScrollRef, stopLyric, pureMusicLyric, playingLyric } = useLyric({ songReady, currentTime })
+    const { currentShow, middleLStyle, middleRStyle, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd } = useMiddleInteractive()
 
     // 初始化时会执行一次，然后当监听的数据发生变化(即当前歌曲切换)时，watch 的回调函数会触发
     watch(currentSong, (newSong) => {
@@ -268,7 +280,13 @@ export default {
       updateTime,
       onProgressChanging,
       onProgressChanged,
-      end
+      end,
+      currentShow,
+      middleLStyle,
+      middleRStyle,
+      onMiddleTouchStart,
+      onMiddleTouchMove,
+      onMiddleTouchEnd
     }
   }
 }
@@ -416,6 +434,24 @@ export default {
       position: absolute;
       bottom: 50px;
       width: 100%;
+      .dot-wrapper {
+        text-align: center;
+        font-size: 0;
+        .dot {
+          display: inline-block;
+          vertical-align: middle;
+          margin: 0 4px;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: $color-text-l;
+          &.active {
+            width: 20px;
+            border-radius: 5px;
+            background: $color-text-ll;
+          }
+        }
+      }
       .progress-wrapper {
         display: flex;
         align-items: center;
