@@ -158,6 +158,7 @@ export default {
       const audieEl = audioRef.value
       audieEl.currentTime = 0
       audieEl.play()
+      store.commit('setPlayingState', true)
     }
     function prev() {
       const list = playList.value

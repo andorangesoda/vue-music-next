@@ -43,6 +43,7 @@ export default {
     }
   },
   created() {
+    // 不需要响应式，只是进度变化是需要用到，所以没放到 data 中，提高性能
     this.touch = {}
   },
   emits: ['progress-changing', 'progress-changed'],
