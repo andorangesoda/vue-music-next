@@ -215,6 +215,9 @@ export default {
       // 拖动进度条时，该标识置为 true
       progressChanging = true
       currentTime.value = currentSong.value.duration * progress
+      // 同步歌词
+      playLyric()
+      stopLyric()
     }
     function onProgressChanged(progress) {
       // 拖动进度动作完成后，该标识置为 false
@@ -224,6 +227,8 @@ export default {
       if (!playingState.value) {
         store.commit('setPlayingState', true)
       }
+      // 同步歌词
+      playLyric()
     }
     function end() {
       // 当歌曲播放完成，跳到下一首
