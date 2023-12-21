@@ -44,7 +44,9 @@
         <div class="progress-wrapper">
           <span class="time time-l"> {{ formatTime(currentTime) }} </span>
           <div class="progress-bar-wrapper">
-            <progress-bar :progress="progress"></progress-bar>
+            <progress-bar :progress="progress"
+            @progress-changing="onProgressChanging"
+            @progress-changed="onProgressChanged"></progress-bar>
           </div>
           <span class="time time-r"> {{ formatTime(currentSong.duration) }} </span>
         </div>
@@ -94,6 +96,7 @@ export default {
     const audioRef = ref(null)
     const songReady = ref(false)
     const currentTime = ref(0)
+    let progressChanging = false
 
     const fullScreen = computed(() => store.state.fullScreen)
     const currentSong = computed(() => store.getters.currentSong)
@@ -201,8 +204,25 @@ export default {
       songReady.value = true
     }
     function updateTime(e) {
-      // 利用 audio 的原生事件，更新当前时间
-      currentTime.value = e.target.currentTime
+      // 进度条没有被拖动时，才触发，避免手动拖动进度条时，进度条自身监听到变化，也进行了更新，导致拖动进度失败的现象
+      if (!progressChanging) {
+        // 利用 audio 的原生事件，监听并更新当前时间
+        currentTime.value = e.target.currentTime
+      }
+    }
+    function onProgressChanging(progress) {
+      // 拖动进度条时，该标识置为 true
+      progressChanging = true
+      currentTime.value = currentSong.value.duration * progress
+    }
+    function onProgressChanged(progress) {
+      // 拖动进度动作完成后，该标识置为 false
+      progressChanging = false
+      audioRef.value.currentTime = currentTime.value = currentSong.value.duration * progress
+      // 进度更新后，如果播放状态是停止的，则开启播放
+      if (!playingState.value) {
+        store.commit('setPlayingState', true)
+      }
     }
 
     return {
@@ -234,7 +254,9 @@ export default {
       currentTime,
       progress,
       formatTime,
-      updateTime
+      updateTime,
+      onProgressChanging,
+      onProgressChanged
     }
   }
 }
