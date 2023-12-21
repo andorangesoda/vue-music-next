@@ -71,7 +71,7 @@
       </div>
     </div>
     <!-- 通过ref 拿到这个audio -->
-    <audio ref="audioRef" @pause="onPause" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
+    <audio ref="audioRef" @pause="onPause" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
@@ -224,6 +224,11 @@ export default {
         store.commit('setPlayingState', true)
       }
     }
+    function end() {
+      // 当歌曲播放完成，跳到下一首
+      currentTime.value = 0
+      next()
+    }
 
     return {
       fullScreen,
@@ -256,7 +261,8 @@ export default {
       formatTime,
       updateTime,
       onProgressChanging,
-      onProgressChanged
+      onProgressChanged,
+      end
     }
   }
 }
