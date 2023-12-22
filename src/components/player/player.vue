@@ -54,7 +54,7 @@
         <div class="progress-wrapper">
           <span class="time time-l"> {{ formatTime(currentTime) }} </span>
           <div class="progress-bar-wrapper">
-            <progress-bar :progress="progress"
+            <progress-bar :progress="progress" ref="barRef"
             @progress-changing="onProgressChanging"
             @progress-changed="onProgressChanged"></progress-bar>
           </div>
@@ -89,7 +89,7 @@
 
 <script>
 import { useStore } from 'vuex'
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, nextTick } from 'vue'
 import useFavorite from './use-favorite'
 import useCd from '@/components/player/use-cd'
 import Scroll from '@/components/base/scroll/scroll.vue'
@@ -112,6 +112,7 @@ export default {
     const songReady = ref(false)
     const currentTime = ref(0)
     let progressChanging = false
+    const barRef = ref(null)
 
     const fullScreen = computed(() => store.state.fullScreen)
     const currentSong = computed(() => store.getters.currentSong)
@@ -154,6 +155,15 @@ export default {
       } else {
         audioEl.pause()
         stopLyric()
+      }
+    })
+    watch(fullScreen, async (newFullScreen) => {
+      // 当监听到展示全屏，重新计算进度条的偏移量，处理在非全屏状态下，进度条没监听并计算偏移量的情况
+      if (newFullScreen) {
+        // 因为 setOffset 方法中有使用 this.$el 操作 DOM
+        // 此处使用 nextTick() 以便 Vue 先更新 DOM 后再执行计算偏移量的操作
+        await nextTick()
+        barRef.value.setOffset(progress.value)
       }
     })
 
@@ -291,7 +301,8 @@ export default {
       onMiddleTouchStart,
       onMiddleTouchMove,
       onMiddleTouchEnd,
-      playList
+      playList,
+      barRef
     }
   }
 }
