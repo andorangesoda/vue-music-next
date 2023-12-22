@@ -81,7 +81,7 @@
       </div>
     </div>
     <!-- mini 播放器 -->
-    <mini-player></mini-player>
+    <mini-player :progress="progress" :toggle-play="togglePlay"></mini-player>
     <!-- 通过ref 拿到这个audio -->
     <audio ref="audioRef" @pause="onPause" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
