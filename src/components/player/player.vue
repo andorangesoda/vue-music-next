@@ -1,5 +1,5 @@
 <template>
-  <div class="player">
+  <div class="player" v-show="playList.length">
     <div class="normal-player" v-show="fullScreen">
       <!-- 背景图 -->
       <div class="background">
@@ -80,6 +80,8 @@
         </div>
       </div>
     </div>
+    <!-- mini 播放器 -->
+    <mini-player></mini-player>
     <!-- 通过ref 拿到这个audio -->
     <audio ref="audioRef" @pause="onPause" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
@@ -95,10 +97,12 @@ import useLyric from '@/components/player/use-lyric'
 import ProgressBar from '@/components/player/progress-bar.vue'
 import { formatTime } from '@/assets/js/util'
 import useMiddleInteractive from '@/components/player/use-middle-interactive'
+import MiniPlayer from './mini-player'
 
 export default {
   name: 'player',
   components: {
+    MiniPlayer,
     ProgressBar,
     Scroll
   },
@@ -286,7 +290,8 @@ export default {
       middleRStyle,
       onMiddleTouchStart,
       onMiddleTouchMove,
-      onMiddleTouchEnd
+      onMiddleTouchEnd,
+      playList
     }
   }
 }
