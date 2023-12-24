@@ -1,35 +1,45 @@
 <template>
   <transition name="mini">
     <div class="mini-player" v-show="!fullScreen" @click="showNormalPlayer">
+      <!-- CD -->
       <div class="cd-wrapper">
         <div class="cd" ref="cdRef">
           <img :class="cdCls" :src="currentSong.pic" ref="cdImageRef" width="40" height="40">
         </div>
       </div>
+      <!-- 歌曲描述 -->
       <div class="slider-wrapper">
         <h2 class="name"> {{currentSong.name}} </h2>
         <p class="desc"> {{currentSong.singer}} </p>
       </div>
+      <!-- 播放按钮 -->
       <div class="control">
         <progress-circle :radius="32" :progress="progress">
           <!-- click.stop 组织事件冒泡，影响其他事件，利用其他组件传递的 togglePlay 函数控制播放 -->
           <i class="icon-mini" :class="miniPlayIcon" @click.stop="togglePlay"></i>
         </progress-circle>
       </div>
+      <!-- 播放列表 -->
+      <div class="control" @click.stop="showPlaylist">
+        <i class="icon-playlist"></i>
+      </div>
+      <playlist ref="playlistRef"></playlist>
     </div>
   </transition>
 </template>
 
 <script>
 import { useStore } from 'vuex'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import useCd from './use-cd'
 import ProgressCircle from '@/components/player/progress-circle.vue'
+import Playlist from '@/components/player/playlist.vue'
 
 export default {
   name: 'mini-player',
   components: {
-    ProgressCircle
+    ProgressCircle,
+    Playlist
   },
   props: {
     progress: {
@@ -39,6 +49,7 @@ export default {
     togglePlay: Function
   },
   setup() {
+    const playlistRef = ref(null)
     const store = useStore()
     const { cdCls, cdRef, cdImageRef } = useCd()
 
@@ -50,6 +61,9 @@ export default {
     function showNormalPlayer() {
       store.commit('setFullScreen', true)
     }
+    function showPlaylist() {
+      playlistRef.value.show()
+    }
 
     return {
       fullScreen,
@@ -59,7 +73,9 @@ export default {
       cdCls,
       cdRef,
       cdImageRef,
-      miniPlayIcon
+      miniPlayIcon,
+      playlistRef,
+      showPlaylist
     }
   }
 }
