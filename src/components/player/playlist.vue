@@ -10,6 +10,9 @@
             <h1 class="title">
               <i class="icon"></i>
               <span class="text"> 播放列表 </span>
+              <span class="clear" @click="showConfirm">
+                <i class="icon-clear"></i>
+              </span>
             </h1>
           </div>
           <!-- 中间列表滚动栏 -->
@@ -32,6 +35,7 @@
           <div class="list-footer" @click="hide">
             <span>关闭</span>
           </div>
+          <confirm ref="confirmRef" @confirm="confirmClear" text="是否清空播放列表？" confirm-btn-text="清空"></confirm>
         </div>
       </div>
     </transition>
@@ -43,17 +47,20 @@ import Scroll from '@/components/base/scroll/scroll'
 import { computed, nextTick, ref } from 'vue'
 import { useStore } from 'vuex'
 import useFavorite from '@/components/player/use-favorite'
+import Confirm from '@/components/base/confirm/confirm.vue'
 
 export default {
   name: 'playlist',
   components: {
-    Scroll
+    Scroll,
+    Confirm
   },
   setup() {
     const visible = ref(false)
     const scrollRef = ref(null)
     const listRef = ref(null)
     const removing = ref(false)
+    const confirmRef = ref(null)
 
     const store = useStore()
     const playList = computed(() => store.state.playList)
@@ -114,11 +121,21 @@ export default {
         return
       }
       removing.value = true
+      if (!playList.value.length) {
+        hide()
+      }
       store.dispatch('removeSong', song)
       // 300 毫秒之后结束‘正在删除’状态
       setTimeout(() => {
         removing.value = false
       }, 300)
+    }
+    function showConfirm() {
+      confirmRef.value.show()
+    }
+    function confirmClear() {
+      store.dispatch('clearSongList')
+      hide()
     }
 
     return {
@@ -134,7 +151,10 @@ export default {
       selectItem,
       listRef,
       removeSong,
-      removing
+      removing,
+      confirmRef,
+      showConfirm,
+      confirmClear
     }
   }
 }
