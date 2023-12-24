@@ -30,7 +30,7 @@
 <script>
 import Scroll from '@/components/base/scroll/scroll.vue'
 import SongList from '@/components/base/song-list/song-list'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 // 歌曲列表到顶部之间保留40px
 const RESERVED_HEIGHT = 40
@@ -91,8 +91,10 @@ export default {
       }
     },
     scrollStyle() {
+      const bottom = this.playList.length ? '60px' : '0'
       return {
-        top: `${this.imageHeight}px`
+        top: `${this.imageHeight}px`,
+        bottom
       }
     },
     playBtnStyle() {
@@ -101,7 +103,10 @@ export default {
         display = 'none'
       }
       return { display }
-    }
+    },
+    ...mapState([
+      'playList'
+    ])
   },
   mounted() {
     this.imageHeight = this.$refs.bgImage.clientHeight
