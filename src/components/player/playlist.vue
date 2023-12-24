@@ -96,7 +96,7 @@ export default {
       if (idx === -1) {
         return
       }
-      const target = listRef.value.children[idx]
+      const target = listRef.value.$el.children[idx]
       scrollRef.value.scroll.scrollToElement(target, 300)
     }
     function selectItem(song) {
