@@ -4,7 +4,7 @@
     <transition name="list-fade">
       <!-- 播放列表 -->
       <div class="playlist" v-show="visible && playList.length" @click="hide">
-        <div class="list-wrapper">
+        <div class="list-wrapper" @click.stop>
           <!-- 列表头部操作栏 -->
           <div class="list-header">
             <h1 class="title">
@@ -14,18 +14,18 @@
           </div>
           <!-- 中间列表滚动栏 -->
           <scroll class="list-content" ref="scrollRef">
-            <ul>
-              <li class="item" v-for="song in sequenceList" :key="song.id">
+            <ul ref="listRef">
+              <li class="item" v-for="song in sequenceList" :key="song.id" @click="selectItem(song)">
                 <i class="current" :class="getCurrentIcon(song)"></i>
                 <span class="text">{{song.name}}</span>
-                <span class="favorite" @click.stop="toggleFavoriteSong(song)">
+                <span class="favorite" @click="toggleFavoriteSong(song)">
                 <i :class="getFavoriteIcon(song)"></i>
               </span>
               </li>
             </ul>
           </scroll>
           <!-- 列表底部操作栏 -->
-          <div class="list-footer" @click.stop="hide">
+          <div class="list-footer" @click="hide">
             <span>关闭</span>
           </div>
         </div>
@@ -48,6 +48,7 @@ export default {
   setup() {
     const visible = ref(false)
     const scrollRef = ref(null)
+    const listRef = ref(null)
 
     const store = useStore()
     const playList = computed(() => store.state.playList)
@@ -57,11 +58,21 @@ export default {
     // hooks
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
 
+    // 监听歌曲变化，更新播放列表
+    show(currentSong, async (newSong) => {
+      if (!visible.value) {
+        return
+      }
+      await nextTick()
+      scrollToCurrent()
+    })
+
     async function show() {
       visible.value = true
       // 在播放列表显示时，更新 DOM 后，刷新 scroll 组件
       await nextTick()
       refreshScroll()
+      scrollToCurrent()
     }
     function hide() {
       visible.value = false
@@ -75,6 +86,23 @@ export default {
       // scroll 组件又是滚动不了，是刷新时机不对
       scrollRef.value.scroll.refresh()
     }
+    function scrollToCurrent() {
+      // 获取当前歌曲在播放列表中的索引，滚到到此即可
+      const idx = sequenceList.value.findIndex((song) => currentSong.value.id === song.id)
+      if (idx === -1) {
+        return
+      }
+      const target = listRef.value.children[idx]
+      scrollRef.value.scroll.scrollToElement(target, 300)
+    }
+    function selectItem(song) {
+      const index = playList.value.findIndex((item) => {
+        return song.id === item.id
+      })
+      // 选择当前歌曲后，更新播放状态
+      store.commit('setCurrentIndex', index)
+      store.commit('setPlayingState', true)
+    }
 
     return {
       visible,
@@ -85,7 +113,9 @@ export default {
       show,
       hide,
       getCurrentIcon,
-      scrollRef
+      scrollRef,
+      selectItem,
+      listRef
     }
   }
 }
