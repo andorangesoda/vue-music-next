@@ -13,14 +13,16 @@
             </h1>
           </div>
           <!-- 中间列表滚动栏 -->
-          <scroll class="list-content">
-            <li class="item" v-for="song in sequenceList" :key="song.id">
-              <i class="current" :class="getCurrentIcon(song)"></i>
-              <span class="text">{{song.name}}</span>
-              <span class="favorite" @click.stop="toggleFavoriteSong(song)">
+          <scroll class="list-content" ref="scrollRef">
+            <ul>
+              <li class="item" v-for="song in sequenceList" :key="song.id">
+                <i class="current" :class="getCurrentIcon(song)"></i>
+                <span class="text">{{song.name}}</span>
+                <span class="favorite" @click.stop="toggleFavoriteSong(song)">
                 <i :class="getFavoriteIcon(song)"></i>
               </span>
-            </li>
+              </li>
+            </ul>
           </scroll>
           <!-- 列表底部操作栏 -->
           <div class="list-footer" @click.stop="hide">
@@ -34,7 +36,7 @@
 
 <script>
 import Scroll from '@/components/base/scroll/scroll'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { useStore } from 'vuex'
 import useFavorite from '@/components/player/use-favorite'
 
@@ -45,6 +47,7 @@ export default {
   },
   setup() {
     const visible = ref(false)
+    const scrollRef = ref(null)
 
     const store = useStore()
     const playList = computed(() => store.state.playList)
@@ -54,8 +57,11 @@ export default {
     // hooks
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
 
-    function show() {
+    async function show() {
       visible.value = true
+      // 在播放列表显示时，更新 DOM 后，刷新 scroll 组件
+      await nextTick()
+      refreshScroll()
     }
     function hide() {
       visible.value = false
@@ -64,6 +70,10 @@ export default {
       if (currentSong.value.id === song.id) {
         return 'icon-play'
       }
+    }
+    function refreshScroll() {
+      // scroll 组件又是滚动不了，是刷新时机不对
+      scrollRef.value.scroll.refresh()
     }
 
     return {
@@ -74,7 +84,8 @@ export default {
       toggleFavoriteSong,
       show,
       hide,
-      getCurrentIcon
+      getCurrentIcon,
+      scrollRef
     }
   }
 }
