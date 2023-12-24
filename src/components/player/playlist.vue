@@ -14,15 +14,19 @@
           </div>
           <!-- 中间列表滚动栏 -->
           <scroll class="list-content" ref="scrollRef">
-            <ul ref="listRef">
+            <!-- 为了删除歌曲时，让列表也有个过渡效果-->
+            <transition-group ref="listRef" name="list" tag="ul">
               <li class="item" v-for="song in sequenceList" :key="song.id" @click="selectItem(song)">
                 <i class="current" :class="getCurrentIcon(song)"></i>
                 <span class="text">{{song.name}}</span>
-                <span class="favorite" @click="toggleFavoriteSong(song)">
-                <i :class="getFavoriteIcon(song)"></i>
-              </span>
+                <span class="favorite" @click.stop="toggleFavoriteSong(song)">
+                  <i :class="getFavoriteIcon(song)"></i>
+                </span>
+                <span class="delete" @click.stop="removeSong(song)">
+                  <i class="icon-delete"></i>
+                </span>
               </li>
-            </ul>
+            </transition-group>
           </scroll>
           <!-- 列表底部操作栏 -->
           <div class="list-footer" @click="hide">
@@ -103,6 +107,9 @@ export default {
       store.commit('setCurrentIndex', index)
       store.commit('setPlayingState', true)
     }
+    function removeSong(song) {
+      store.dispatch('removeSong', song)
+    }
 
     return {
       visible,
@@ -115,7 +122,8 @@ export default {
       getCurrentIcon,
       scrollRef,
       selectItem,
-      listRef
+      listRef,
+      removeSong
     }
   }
 }
