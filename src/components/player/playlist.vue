@@ -22,7 +22,7 @@
                 <span class="favorite" @click.stop="toggleFavoriteSong(song)">
                   <i :class="getFavoriteIcon(song)"></i>
                 </span>
-                <span class="delete" @click.stop="removeSong(song)">
+                <span class="delete" :class="{'disable': removing}" @click.stop="removeSong(song)">
                   <i class="icon-delete"></i>
                 </span>
               </li>
@@ -53,6 +53,7 @@ export default {
     const visible = ref(false)
     const scrollRef = ref(null)
     const listRef = ref(null)
+    const removing = ref(false)
 
     const store = useStore()
     const playList = computed(() => store.state.playList)
@@ -64,7 +65,7 @@ export default {
 
     // 监听歌曲变化，更新播放列表
     show(currentSong, async (newSong) => {
-      if (!visible.value) {
+      if (!visible.value || !newSong.id) {
         return
       }
       await nextTick()
@@ -108,7 +109,16 @@ export default {
       store.commit('setPlayingState', true)
     }
     function removeSong(song) {
+      if (removing.value) {
+        // 处理快速或多次删除操作
+        return
+      }
+      removing.value = true
       store.dispatch('removeSong', song)
+      // 300 毫秒之后结束‘正在删除’状态
+      setTimeout(() => {
+        removing.value = false
+      }, 300)
     }
 
     return {
@@ -123,7 +133,8 @@ export default {
       scrollRef,
       selectItem,
       listRef,
-      removeSong
+      removeSong,
+      removing
     }
   }
 }

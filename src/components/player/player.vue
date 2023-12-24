@@ -142,6 +142,7 @@ export default {
       audioEl.src = newSong.url
       // 调用播放
       audioEl.play()
+      store.commit('setPlayingState', true)
     })
     watch(playingState, (newPlayingState) => {
       if (!songReady.value) {
