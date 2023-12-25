@@ -1,6 +1,7 @@
 <template>
   <div class="top-detail">
-    <music-list :songs="songs" :title="title" :pic="pic"></music-list>
+    <!-- rank 会渲染前三的奖杯图标 -->
+    <music-list :songs="songs" :title="title" :pic="pic" rank></music-list>
   </div>
 </template>
 

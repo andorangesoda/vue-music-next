@@ -21,7 +21,7 @@
     <scroll class="list" :style="scrollStyle" :probe-type="3" @scroll="onScroll">
       <!-- 歌曲列表 -->
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @select="onSelectSong"></song-list>
+        <song-list :songs="songs" @select="onSelectSong" :rank="rank"></song-list>
       </div>
     </scroll>
   </div>
@@ -49,7 +49,8 @@ export default {
       }
     },
     title: String,
-    pic: String
+    pic: String,
+    rank: Boolean
   },
   data() {
     return {
