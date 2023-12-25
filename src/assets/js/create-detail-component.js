@@ -23,6 +23,7 @@ export default function createDetailComponent(name, key, fetch) {
           ret = data
         } else {
           const cached = storage.session.get(key)
+          // 因为 this.$route.params.id 是 string 类型的，而 cached.id 是 number 类型，所以要转成 string 类型
           if (cached && (cached.mid || cached.id + '') === this.$route.params.id) {
             ret = cached
           }
@@ -35,6 +36,7 @@ export default function createDetailComponent(name, key, fetch) {
       },
       title() {
         const data = this.computedData
+        // 歌单详情中的名称是 title 不是 name
         return data && (data.name || data.title)
       }
     },
