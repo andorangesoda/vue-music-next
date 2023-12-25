@@ -7,7 +7,7 @@
 <script>
 import { getSingerDetail } from '@/service/singer'
 import { SINGER_KEY } from '@/assets/js/constant'
-import createDetailComponent from '@/assets/js/create-detail-componet'
+import createDetailComponent from '@/assets/js/create-detail-component'
 
 // 提取公用逻辑
 export default createDetailComponent('singer-detail', SINGER_KEY, getSingerDetail)
