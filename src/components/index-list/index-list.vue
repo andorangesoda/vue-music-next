@@ -6,7 +6,7 @@
         <ul>
           <li class="item" v-for="item in group.list" :key="item.id" @click="onItemClick(item)">
             <img v-if="item.pic" class="avatar" :src="item.pic">
-            <img v-else class="avatar" src="@/assets/images/default.png">
+            <img v-else class="avatar" src="../../assets/images/default.png">
             <span class="name"> {{item.name}} </span>
           </li>
         </ul>
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import Scroll from '@/components/base/scroll/scroll'
+import Scroll from '@/components/wrap-scroll'
 
 export default {
   name: 'index-list',

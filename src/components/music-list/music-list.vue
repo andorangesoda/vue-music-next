@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import Scroll from '@/components/base/scroll/scroll.vue'
+import Scroll from '@/components/wrap-scroll'
 import SongList from '@/components/base/song-list/song-list'
 import { mapActions, mapState } from 'vuex'
 
