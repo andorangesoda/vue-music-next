@@ -25,6 +25,7 @@
 import { ref, watch } from 'vue'
 import { search } from '@/service/search'
 import { processSongs } from '@/service/song'
+import usePullUpLoad from '@/components/search/use-pull-up-load'
 
 export default {
   name: 'suggest',
@@ -41,6 +42,7 @@ export default {
     const hasMore = ref(true)
     const page = ref(1)
 
+    const { rootRef } = usePullUpLoad(searchMore)
     // 直接 watch(props.query, (newQuery) => {}) 不行，因为 watch 的值要求是一个响应式对象，
     // 而 prop.query 最后的值是一个普通字符串，所以可以通过 watch 一个getter函数 ()=> prop.query
     watch(() => props.query, async (newQuery) => {
@@ -64,10 +66,21 @@ export default {
       singer.value = result.singer
       hasMore.value = result.hasMore
     }
+    async function searchMore() {
+      if (!hasMore.value) {
+        return
+      }
+      page.value++
+      const result = await search(props.query, page.value, props.showSinger)
+      // 因为 processSongs 每次只能处理这页数据，所以还需要拼接原先页的数据
+      songs.value = songs.value.concat(await processSongs(result.songs))
+      hasMore.value = result.hasMore
+    }
 
     return {
       singer,
-      songs
+      songs,
+      rootRef
     }
   }
 }

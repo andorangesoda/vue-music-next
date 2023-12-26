@@ -1031,6 +1031,13 @@
   dependencies:
     "@better-scroll/core" "^2.5.1"
 
+"@better-scroll/pull-up@^2.2.1":
+  version "2.5.1"
+  resolved "https://registry.npmmirror.com/@better-scroll/pull-up/-/pull-up-2.5.1.tgz#d5bcfd8343cdb0601b96484f410ee678c22a3a44"
+  integrity sha512-1hu3xSMxdB8T391KffpNZ7g93lMwZEHjfb1F1Y4KvIkciDt8nXqkGpqrZF+YwR+EJTgYcWqUO8kgmI6XXu7Pkg==
+  dependencies:
+    "@better-scroll/core" "^2.5.1"
+
 "@better-scroll/shared-utils@^2.5.1":
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/@better-scroll/shared-utils/-/shared-utils-2.5.1.tgz#ed6a1b5713462fa50afd8bb7d172ca218a0b7f2e"
