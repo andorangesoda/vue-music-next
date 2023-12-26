@@ -70,10 +70,11 @@ export default {
       await makeItScrollable()
     }
     async function searchMore() {
-      if (!hasMore.value) {
+      if (!hasMore.value || !props.query) {
         return
       }
       page.value++
+      // 因为 prop.query 是动态的，如果界面上将 query 清空了，就会导致不满一屏时这里不断循环请求，所以需要判断 query
       const result = await search(props.query, page.value, props.showSinger)
       // 因为 processSongs 每次只能处理这页数据，所以还需要拼接原先页的数据
       songs.value = songs.value.concat(await processSongs(result.songs))
