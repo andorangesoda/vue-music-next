@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <span class="icon"></span>
-    <h1 class="text">Cloud Music</h1>
+    <h1 class="text">Mini Music</h1>
   </div>
 </template>
 
