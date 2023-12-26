@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { search } from '@/service/search'
 import { processSongs } from '@/service/song'
 import usePullUpLoad from '@/components/search/use-pull-up-load'
@@ -42,7 +42,7 @@ export default {
     const hasMore = ref(true)
     const page = ref(1)
 
-    const { rootRef } = usePullUpLoad(searchMore)
+    const { rootRef, scroll } = usePullUpLoad(searchMore)
     // 直接 watch(props.query, (newQuery) => {}) 不行，因为 watch 的值要求是一个响应式对象，
     // 而 prop.query 最后的值是一个普通字符串，所以可以通过 watch 一个getter函数 ()=> prop.query
     watch(() => props.query, async (newQuery) => {
@@ -65,6 +65,9 @@ export default {
       songs.value = await processSongs(result.songs)
       singer.value = result.singer
       hasMore.value = result.hasMore
+
+      await nextTick()
+      await makeItScrollable()
     }
     async function searchMore() {
       if (!hasMore.value) {
@@ -75,6 +78,15 @@ export default {
       // 因为 processSongs 每次只能处理这页数据，所以还需要拼接原先页的数据
       songs.value = songs.value.concat(await processSongs(result.songs))
       hasMore.value = result.hasMore
+      // 在查询结果不满一屏的情况下，更新 DOM 结构后，再次请求数据进行渲染
+      await nextTick()
+      await makeItScrollable()
+    }
+    async function makeItScrollable() {
+      if (scroll.value.maxScrollY >= -1) {
+        // 不满一屏，就再次请求数据
+        await searchMore()
+      }
     }
 
     return {
