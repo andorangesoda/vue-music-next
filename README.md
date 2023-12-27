@@ -2,22 +2,28 @@
 
 基于Vue3+Webpack开发的Web App音乐软件。
 
-## Project setup
+### 1、依赖安装
 ```
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+### 2、开发时的编译和热加载
 ```
 yarn serve
 ```
 
-### Compiles and minifies for production
+### 3、构建
 ```
 yarn build
+
+
+```
+### 4、分析报告
+```
+yarn run build --report
 ```
 
-### Lints and fixes files
+### 5、检查和修复
 ```
 yarn lint
 ```
