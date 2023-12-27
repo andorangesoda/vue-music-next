@@ -44,7 +44,7 @@
 
 <script>
 import Scroll from '@/components/base/scroll/scroll'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import useFavorite from '@/components/player/use-favorite'
 import Confirm from '@/components/base/confirm/confirm.vue'
@@ -73,7 +73,7 @@ export default {
     const { modeIcon, modeText, changeMode } = useMode()
 
     // 监听歌曲变化，更新播放列表
-    show(currentSong, async (newSong) => {
+    watch(currentSong, async (newSong) => {
       if (!visible.value || !newSong.id) {
         return
       }
