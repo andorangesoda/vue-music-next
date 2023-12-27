@@ -1,7 +1,11 @@
 <template>
   <m-header></m-header>
   <tab></tab>
-  <router-view :style="viewStyle"></router-view>
+  <router-view :style="viewStyle" v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
   <player></player>
 </template>
 
