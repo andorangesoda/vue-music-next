@@ -7,7 +7,7 @@ const state = {
   // 播放列表
   playList: [],
   playingState: false,
-  platMode: PLAY_MODE.sequence,
+  playMode: PLAY_MODE.sequence,
   currentIndex: 0,
   fullScreen: false,
   favoriteList: load(FAVORITE_KEY)

@@ -8,8 +8,8 @@
           <!-- 列表头部操作栏 -->
           <div class="list-header">
             <h1 class="title">
-              <i class="icon"></i>
-              <span class="text"> 播放列表 </span>
+              <i class="icon" :class="modeIcon" @click="changeMode"></i>
+              <span class="text"> {{modeText}} </span>
               <span class="clear" @click="showConfirm">
                 <i class="icon-clear"></i>
               </span>
@@ -48,6 +48,7 @@ import { computed, nextTick, ref } from 'vue'
 import { useStore } from 'vuex'
 import useFavorite from '@/components/player/use-favorite'
 import Confirm from '@/components/base/confirm/confirm.vue'
+import useMode from '@/components/player/use-mode'
 
 export default {
   name: 'playlist',
@@ -69,6 +70,7 @@ export default {
 
     // hooks
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
+    const { modeIcon, modeText, changeMode } = useMode()
 
     // 监听歌曲变化，更新播放列表
     show(currentSong, async (newSong) => {
@@ -154,7 +156,10 @@ export default {
       removing,
       confirmRef,
       showConfirm,
-      confirmClear
+      confirmClear,
+      modeIcon,
+      modeText,
+      changeMode
     }
   }
 }

@@ -63,7 +63,7 @@
         <!-- 菜单栏 -->
         <div class="operators">
           <div class="icon i-left">
-            <i class="icon-sequence"></i>
+            <i @click="changeMode" :class="modeIcon"></i>
           </div>
           <div class="icon i-left" @click="prev" :class="disableCls">
             <i class="icon-prev"></i>
@@ -98,6 +98,8 @@ import ProgressBar from '@/components/player/progress-bar.vue'
 import { formatTime } from '@/assets/js/util'
 import useMiddleInteractive from '@/components/player/use-middle-interactive'
 import MiniPlayer from './mini-player'
+import useMode from '@/components/player/use-mode'
+import { PLAY_MODE } from '@/assets/js/constant'
 
 export default {
   name: 'player',
@@ -122,12 +124,14 @@ export default {
     const currentIdx = computed(() => store.state.currentIndex)
     const disableCls = computed(() => songReady.value ? '' : 'disable')
     const progress = computed(() => currentTime.value / currentSong.value.duration)
+    const playMode = computed(() => store.state.playMode)
 
     // hooks
     const { getFavoriteIcon, toggleFavoriteSong } = useFavorite()
     const { cdCls, cdRef, cdImageRef } = useCd()
     const { currentLyric, currentLineNum, playLyric, lyricListRef, lyricScrollRef, stopLyric, pureMusicLyric, playingLyric } = useLyric({ songReady, currentTime })
     const { currentShow, middleLStyle, middleRStyle, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd } = useMiddleInteractive()
+    const { modeIcon, changeMode } = useMode()
 
     // 初始化时会执行一次，然后当监听的数据发生变化(即当前歌曲切换)时，watch 的回调函数会触发
     watch(currentSong, (newSong) => {
@@ -189,7 +193,7 @@ export default {
     }
     function prev() {
       const list = playList.value
-      if (!songReady.value || !list) { return }
+      if (!songReady.value || !list.length) { return }
       if (list.length === 1) {
         loop()
       } else {
@@ -260,7 +264,11 @@ export default {
     function end() {
       // 当歌曲播放完成，跳到下一首
       currentTime.value = 0
-      next()
+      if (playMode.value === PLAY_MODE.loop) {
+        loop()
+      } else {
+        next()
+      }
     }
 
     return {
@@ -303,7 +311,9 @@ export default {
       onMiddleTouchMove,
       onMiddleTouchEnd,
       playList,
-      barRef
+      barRef,
+      modeIcon,
+      changeMode
     }
   }
 }
